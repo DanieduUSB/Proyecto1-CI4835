@@ -10,7 +10,7 @@ PROGS = server client
 
 all: $(PROGS)
 
-%: %.cpp
+%: src/%.cpp
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
