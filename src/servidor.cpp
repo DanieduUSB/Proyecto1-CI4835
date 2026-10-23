@@ -69,24 +69,15 @@ int main(int argc, char* argv[]) {
     }
     log("listening http on port " + std::string(argv[4]));
 
-    Socket mail_listener = make_listener(std::stoi(argv[6]));
-    if (!mail_listener.ok()) {
-        perror("mail listener socket");
-        return 1;
-    }
-    log("listening mail on port " + std::string(argv[6]));
-
     // Configura los pollfd para cada listener
     pollfd chat_pollfd{chat_listener.get_fd(), POLLIN, 0};
 
     pollfd http_pollfd{http_listener.get_fd(), POLLIN, 0};
 
-    pollfd mail_pollfd{mail_listener.get_fd(), POLLIN, 0};
-
     // Crea un vector mutable de pollfd para poder usarlo en poll(). Este vector
     // también recibirá los pollfd de los sockets aceptados, que se irán agregando
     // dinámicamente.
-    std::vector<pollfd> pollfds{chat_pollfd, http_pollfd, mail_pollfd};
+    std::vector<pollfd> pollfds{chat_pollfd, http_pollfd};
 
     // Acepta por siempre conexiones entrantes y las agrega a pollfds
     while (true) {
@@ -112,8 +103,6 @@ int main(int argc, char* argv[]) {
                     pollfds.push_back({client_fd, POLLIN, 0});
                 } else if (pollfds[i].fd == http_listener.get_fd()) {
                     // Acepta una nueva conexión HTTP
-                } else if (pollfds[i].fd == mail_listener.get_fd()) {
-                    // Acepta una nueva conexión de buzón
                 } else {
                     // Datos de un cliente ya aceptado
                 }
