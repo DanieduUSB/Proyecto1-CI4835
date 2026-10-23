@@ -24,6 +24,15 @@ public:
         other.fd_ = -1; // Evita que el otro Socket cierre el fd
     }
 
+    Socket& operator=(Socket&& other) noexcept { // Operador de movimiento
+        if (this != &other) {
+            if (fd_ >= 0) ::close(fd_);
+            fd_ = other.fd_;
+            other.fd_ = -1;
+        }
+        return *this;
+    }
+
     // Retorna el file descriptor, para connect(), send(), recv(), etc.
     int get_fd() const { return fd_; }
 
