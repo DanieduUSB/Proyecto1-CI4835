@@ -7,8 +7,13 @@
 #include <cstdio> // perror()
 #include <iostream>
 #include <string>
-#include <mutex>
 #include <thread>
+#include <poll.h> // pollfd, poll()
+#include <vector>
+
+void log(const std::string& msg) {
+    std::cout << msg << std::endl;
+}
 
 // Crea el socket bidireccional
 Socket make_listener(int port) {
@@ -49,6 +54,39 @@ int main(int argc, char* argv[]) {
         std::cerr << "Usage: " << argv[0] << " --chat <port> --http <port> --buzones <file>\n";
         return 1;
     }
+
+    Socket chat_listener = make_listener(std::stoi(argv[2]));
+    if (!chat_listener.ok()) {
+        perror("chat listener socket");
+        return 1;
+    }
+    log("listening chat on port " + std::string(argv[2]));
+
+    Socket http_listener = make_listener(std::stoi(argv[4]));
+    if (!http_listener.ok()) {
+        perror("http listener socket");
+        return 1;
+    }
+    log("listening http on port " + std::string(argv[4]));
+
+    Socket mail_listener = make_listener(std::stoi(argv[6]));
+    if (!mail_listener.ok()) {
+        perror("mail listener socket");
+        return 1;
+    }
+    log("listening mail on port " + std::string(argv[6]));
+
+    // Configura los pollfd para cada listener
+    pollfd chat_pollfd{chat_listener.get_fd(), POLLIN, 0};
+
+    pollfd http_pollfd{http_listener.get_fd(), POLLIN, 0};
+
+    pollfd mail_pollfd{mail_listener.get_fd(), POLLIN, 0};
+
+    // Crea un vector mutable de pollfd para poder usarlo en poll(). Este vector
+    // también recibirá los pollfd de los sockets aceptados, que se irán agregando
+    // dinámicamente.
+    std::vector<pollfd> pollfds{chat_pollfd, http_pollfd, mail_pollfd};
 
     return 0;
 }
