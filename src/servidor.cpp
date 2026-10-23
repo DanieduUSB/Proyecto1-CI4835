@@ -2,6 +2,8 @@
 
 #include <socket.hpp>
 
+#include <arpa/inet.h> // sockaddr_in, htons(), inet_pton()
+#include <sys/socket.h> // socket(), connect(), send(), recv(), listen(), accept()
 #include <cstdio> // perror()
 #include <iostream>
 #include <string>
