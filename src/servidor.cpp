@@ -88,5 +88,39 @@ int main(int argc, char* argv[]) {
     // dinámicamente.
     std::vector<pollfd> pollfds{chat_pollfd, http_pollfd, mail_pollfd};
 
+    // Acepta por siempre conexiones entrantes y las agrega a pollfds
+    while (true) {
+        int ret = poll(pollfds.data(), pollfds.size(), -1);
+        if (ret < 0) {
+            perror("poll");
+            return 1;
+        }
+
+        // Recorre los pollfd para ver cuáles tienen eventos
+        for (size_t i = 0; i < pollfds.size(); ++i) {
+            if (pollfds[i].revents & POLLIN) {
+                if (pollfds[i].fd == chat_listener.get_fd()) {
+                    // Acepta una nueva conexión de chat
+                    sockaddr_storage addr{};
+                    socklen_t len = sizeof(addr);
+                    int client_fd = accept(chat_listener.get_fd(), reinterpret_cast<sockaddr*>(&addr), &len);
+                    if (client_fd < 0) {
+                        perror("accept chat");
+                        continue;
+                    }
+                    log("new chat connection accepted");
+                    pollfds.push_back({client_fd, POLLIN, 0});
+                } else if (pollfds[i].fd == http_listener.get_fd()) {
+                    // Acepta una nueva conexión HTTP
+                } else if (pollfds[i].fd == mail_listener.get_fd()) {
+                    // Acepta una nueva conexión de buzón
+                } else {
+                    // Datos de un cliente ya aceptado
+                }
+            }
+        }
+
+    }
+
     return 0;
 }
