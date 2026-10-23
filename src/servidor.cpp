@@ -8,7 +8,7 @@
 #include <mutex>
 #include <thread>
 
-// Crea el socket de escucha
+// Crea el socket bidireccional
 Socket make_listener(int port) {
     int on = 1, off = 0;
     // Intenta con IPv6 primero
@@ -39,6 +39,7 @@ Socket make_listener(int port) {
     }
 
     if (listen(s.get_fd(), SOMAXCONN) < 0) return Socket(-1);
+    return s;
 }
 
 int main(int argc, char* argv[]) {
