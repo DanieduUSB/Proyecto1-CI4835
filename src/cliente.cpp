@@ -1,6 +1,12 @@
-// client.cpp
+// cliente.cpp
 
 #include "socket.hpp"
+
+#include <arpa/inet.h> // sockaddr_in, htons(), inet_pton()
+#include <sys/socket.h> // socket(), connect(), send(), recv()
+#include <cstdio> // perror()
+#include <iostream>
+#include <string>
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {

@@ -28,4 +28,4 @@ public:
     int get_fd() const { return fd_; }
 
     bool ok() const { return fd_ >= 0; } // Retorna true si el socket está abierto
-}
+};

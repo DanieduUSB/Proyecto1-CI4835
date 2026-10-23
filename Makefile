@@ -4,14 +4,14 @@
 # make clean - removes all object files and the executable
 
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra -g
+CXXFLAGS = -std=c++17 -Wall -Wextra -g -Iinclude
 
-PROGS = server client
+PROGS = servidor cliente
 
 all: $(PROGS)
 
-%: src/%.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $<
+%: src/%.cpp include/socket.hpp
+	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
 	rm -f $(PROGS)
